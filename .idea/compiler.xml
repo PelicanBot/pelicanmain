@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="pelican" />
+        <module name="pelicanmain" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="pelican" target="15" />
+      <module name="pelicanmain" target="15" />
     </bytecodeTargetLevel>
   </component>
 </project>

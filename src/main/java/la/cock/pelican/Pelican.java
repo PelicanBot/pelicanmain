@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.util.HashMap;
-import java.util.ServiceConfigurationError;
 
 public class Pelican {
     public static JDA jda;
