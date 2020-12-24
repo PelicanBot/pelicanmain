@@ -9,34 +9,31 @@ import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 public class Pelican {
     public static JDA jda;
     public static char commandPrefix = '>';
-    public static HashMap<String, ChannelInvite> serverInvites = new HashMap<>();
+    public static HashMap<String, Invite> channelInvites = new HashMap<>();
+    public static HashSet<String> existingLinks = new HashSet<String>();
 
     //Main
     public static void main(String[] args) throws LoginException, InterruptedException{
-        jda = JDABuilder.createDefault("NzkxMjQwNjA2OTI3MjkwMzk5.X-MSPQ.gZKCbH1pOi0t66nlXUM2RbVo0GI").enableIntents(GatewayIntent.GUILD_MEMBERS).build().awaitReady();
-        jda.getPresence().setActivity(Activity.playing("| Type >verify"));
-        jda.addEventListener(new Commands());
-        jda.addEventListener(new InviteTracker());
+        jda = JDABuilder.createDefault("NzkxMjQwNjA2OTI3MjkwMzk5.X-MSPQ.z-jNk4QVgBZv9JCGe2943QiLeOc")
+                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                .setActivity(Activity.playing("| Type >verify"))
+                .addEventListeners(new Commands())
+                .addEventListeners(new InviteTracker())
+                .build().awaitReady();
 
         addExistingInvites();
     }
 
     public static void addExistingInvites(){
-        for (Invite invite : jda.getGuilds().get(0).retrieveInvites().complete()){
-            serverInvites.put(invite.getCode(), new ChannelInvite(invite));
-        }
-    }
-
-    public static void updateExistingInvites(){
-        for (String code: serverInvites.keySet()){
-            if (serverInvites.get(code).isExpired()) serverInvites.remove(code);
-        }
-        for (Invite invite : jda.getGuilds().get(0).retrieveInvites().complete()){
-            serverInvites.get(invite.getCode()).updateInvite(invite);
+        List<Invite> existingInvites = jda.getGuilds().get(0).retrieveInvites().complete();
+        for (Invite invite : existingInvites){
+            channelInvites.put(invite.getCode(), invite);
         }
     }
 }

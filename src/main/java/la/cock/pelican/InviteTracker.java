@@ -5,33 +5,29 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.invite.GuildInviteCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class InviteTracker extends ListenerAdapter {
 
     @Override
     public void onGuildInviteCreate(GuildInviteCreateEvent event){
         System.out.println("created new invite");
-        Pelican.serverInvites.put(event.getInvite().getCode(), new ChannelInvite(event.getInvite()));
+        Invite invite = event.getInvite();
+        Pelican.channelInvites.put(invite.getCode(), invite);
     }
 
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event){
-        Pelican.updateExistingInvites();
-        List<String> existingCodes = new ArrayList<String>();
-        for (Invite invite: event.getGuild().retrieveInvites().complete()) existingCodes.add(invite.getCode());
+        System.out.println("member joined");
+        HashMap<String, Invite> existingInvites = new HashMap<>();
+        event.getGuild().retrieveInvites().complete()
+                .stream()
+                .forEach(invite -> existingInvites.put(invite.getCode(), invite));
 
-        for (String code: Pelican.serverInvites.keySet()){
-            ChannelInvite ci = Pelican.serverInvites.get(code);
-            if (ci.getOldUses() == ci.getMaxUses() - 1 && !existingCodes.contains(ci.getCode())){
-                event.getGuild().getDefaultChannel().sendMessage(ci.getCode() + " was incremented.").queue();
-                ci.expireInvite();
-            }
-            else if (ci.getServerInvite().getUses() > ci.getOldUses()){
-                event.getGuild().getDefaultChannel().sendMessage(ci.getCode() + " was incremented.").queue();
-            }
-            ci.updateUses();
+        for (String inviteCode: Pelican.channelInvites.keySet()){
+            if (!existingInvites.containsKey(inviteCode) || Pelican.channelInvites.get(inviteCode).getUses() < existingInvites.get(inviteCode).getUses())
+            event.getMember();
         }
+        Pelican.channelInvites = existingInvites;
     }
 }
